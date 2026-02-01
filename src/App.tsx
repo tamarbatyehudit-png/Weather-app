@@ -62,7 +62,7 @@ export default function App() {
   return (
     <div className="app-container">
       <header className="app-header">
-        <h1>Atmosphere</h1>
+        <h1>yossi</h1>
         <div className="accent-line"></div>
       </header>
 
