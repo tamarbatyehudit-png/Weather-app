@@ -1,0 +1,128 @@
+/* 1. Global Styles - Soft Charcoal */
+body, html {
+  margin: 0;
+  padding: 0;
+  background-color: #121212; 
+  font-family: 'Segoe UI', serif;
+  color: #d9d2c5;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* 2. Main Container */
+.app-container {
+  width: 90%; 
+  max-width: 1400px; 
+  margin: 0 auto;
+  padding: 4vh 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+/* 3. Header Styling */
+.app-header {
+  text-align: center;
+  margin-bottom: 4vh;
+  flex-shrink: 0;
+}
+
+.app-header h1 {
+  font-weight: 300;
+  letter-spacing: 12px;
+  text-transform: uppercase;
+  color: #8b0000;
+  margin: 0;
+  font-size: 2rem;
+}
+
+.accent-line {
+  width: 50px;
+  height: 1px;
+  background-color: #8b0000;
+  margin: 15px auto 0;
+}
+
+/* 4. The 5x2 Grid */
+.weather-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr); 
+  grid-template-rows: repeat(2, 1fr);
+  gap: 20px;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  max-height: 75vh;
+}
+
+/* 5. Weather Card Styling */
+.weather-card {
+  background-color: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  padding: 30px 20px;
+  text-align: center;
+  transition: all 0.4s ease;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.weather-card:hover {
+  border-color: #8b0000;
+  background-color: #1f1f1f;
+  transform: translateY(-4px);
+}
+
+.city-name {
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  margin-bottom: 20px;
+  opacity: 0.5;
+}
+
+.temp-value {
+  font-size: 2.8rem;
+  font-weight: 200;
+  line-height: 1;
+}
+
+/* 6. Responsiveness */
+@media (max-width: 1200px) {
+  .weather-grid {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+  }
+  
+ .app-container {
+  width: 95%;           /* Makes it fill almost the whole screen */
+  max-width: 1600px;    /* Prevents it from getting TOO wide on huge monitors */
+  margin-left: auto;    /* These two lines center the container */
+  margin-right: auto;   
+  padding: 80px 0;
+}
+  
+  body, html {
+    overflow: auto;
+  }
+}
+
+@media (max-width: 600px) {
+  .weather-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(10, 1fr);
+  }
+}
+
+/* 7. Status Messages */
+.status {
+  text-align: center;
+  margin-top: 30px;
+  font-style: italic;
+  opacity: 0.6;
+}
