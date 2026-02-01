@@ -10,7 +10,11 @@ export default function App() {
   const [weatherData, setWeatherData] = useState<CityWeather[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Step 3: Celsius/Fahrenheit toggle state
+  const [isCelsius, setIsCelsius] = useState<boolean>(true);
 
+  // Step 4: Updated list with Tel Aviv and New Delhi (10 cities total)
   const cities = [
     { name: 'London', lat: 51.51, lon: -0.13 },
     { name: 'New York', lat: 40.71, lon: -74.01 },
@@ -19,39 +23,57 @@ export default function App() {
     { name: 'Berlin', lat: 52.52, lon: 13.41 },
     { name: 'Sydney', lat: -33.87, lon: 151.21 },
     { name: 'Rome', lat: 41.90, lon: 12.50 },
-    { name: 'Madrid', lat: 40.42, lon: -3.70 },
     { name: 'Cairo', lat: 30.04, lon: 31.24 },
-    { name: 'Seoul', lat: 37.57, lon: 126.98 }
+    { name: 'Tel Aviv', lat: 32.08, lon: 34.78 }, 
+    { name: 'New Delhi', lat: 28.61, lon: 77.20 }
   ];
+
+  // Helper to handle the math for Fahrenheit
+  const formatTemp = (celsius: number) => {
+    if (isCelsius) return `${celsius.toFixed(1)}°C`;
+    const fahrenheit = (celsius * 9) / 5 + 32;
+    return `${fahrenheit.toFixed(1)}°F`;
+  };
 
   useEffect(() => {
     const fetchWeather = async () => {
-      // The try block attempts the "happy path" (successful connection)
       try {
+        // Checking LocalStorage for the 60-second cache
+        const cached = localStorage.getItem('weather_cache');
+        if (cached) {
+          const { timestamp, data } = JSON.parse(cached);
+          if (Date.now() - timestamp < 60000) {
+            setWeatherData(data);
+            setLoading(false);
+            return; 
+          }
+        }
+
+        // If no fresh cache, we call the API
         const lats = cities.map(c => c.lat).join(',');
         const lons = cities.map(c => c.lon).join(',');
         const url = `https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lons}&current_weather=true`;
 
         const response = await fetch(url);
-
-        // Manually checking if the response is okay (e.g., not a 404 or 500 error)
-        if (!response.ok) {
-          throw new Error('The server responded with an error.');
-        }
+        if (!response.ok) throw new Error('Network response was not ok');
 
         const data = await response.json();
-
+        
         const results = cities.map((city, index) => ({
           name: city.name,
           temp: data[index].current_weather.temperature
         }));
 
+        // Saving the results to LocalStorage for the next 60 seconds
+        localStorage.setItem('weather_cache', JSON.stringify({
+          timestamp: Date.now(),
+          data: results
+        }));
+
         setWeatherData(results);
         setLoading(false);
-      } 
-      // The catch block intercepts any errors during the fetch process
-      catch (err) {
-        setError('Unable to retrieve weather data at this time.');
+      } catch (err) {
+        setError('Failed to load atmosphere data.');
         setLoading(false);
       }
     };
@@ -64,11 +86,18 @@ export default function App() {
       <header className="app-header">
         <h1>Atmosphere</h1>
         <div className="accent-line"></div>
+        
+        {!loading && !error && (
+          <button 
+            className="unit-toggle" 
+            onClick={() => setIsCelsius(!isCelsius)}
+          >
+            Displaying in {isCelsius ? 'Celsius' : 'Fahrenheit'}
+          </button>
+        )}
       </header>
 
-      {/* Conditional rendering for loading, errors, or data */}
-      {loading && <p className="status">Fetching current data...</p>}
-      
+      {loading && <p className="status">Scanning horizons...</p>}
       {error && <p className="status error-text">{error}</p>}
 
       {!loading && !error && (
@@ -76,7 +105,7 @@ export default function App() {
           {weatherData.map((city) => (
             <div key={city.name} className="weather-card">
               <span className="city-name">{city.name}</span>
-              <span className="temp-value">{city.temp}°C</span>
+              <span className="temp-value">{formatTemp(city.temp)}</span>
             </div>
           ))}
         </div>
